@@ -1,6 +1,6 @@
-require("@nomiclabs/hardhat-waffle");
 require('dotenv').config();
 require("@nomiclabs/hardhat-etherscan");
+require("@openzeppelin/hardhat-upgrades");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -68,9 +68,14 @@ module.exports = {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       accounts: [process.env.PRIVATE_KEY],
     },
+    ropsten: {
+      url: `https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
+      accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`],
+      gasPrice: 500000000000
+    },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
-      accounts: [`9ae393df5352ac05fc83cdca57a9302f3276537862c27856d0136a56dfa7cb7d`],
+      accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`],
       gasPrice: 500000000000
     },
     kovan: {
@@ -88,8 +93,8 @@ module.exports = {
     },
   },
   etherscan: {
-    // apiKey: "NPIT4183DK8BMGVZDT9C4R14S1QMEHIT88",
-    apiKey: "Z7ICD5QD8WJ3MGAF7PA7WBKV2YUBHU67M3",
+    apiKey: "5573EP51U35FDS837XT1AMD5I7QWQJ2PZ5", // etherscan
+    // apiKey: "Z7ICD5QD8WJ3MGAF7PA7WBKV2YUBHU67M3",
     additionalNetworks: {
         polygon: "WZB1DPUWYZ13SQSGHFTTEY43YJYAEFY2EH",
         polygonMumbai: "WZB1DPUWYZ13SQSGHFTTEY43YJYAEFY2EH",

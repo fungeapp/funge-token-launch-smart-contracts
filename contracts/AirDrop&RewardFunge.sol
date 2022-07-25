@@ -928,6 +928,7 @@ contract AirdropRewardFunge is Ownable, Initializable {
             // send rewards
             safeRewards(msg.sender, user.claimAmount);
             user.claimedTime = block.timestamp;
+            user.claimAmount = 0;
         }
         
         emit Claim(msg.sender, user.claimAmount);
@@ -990,7 +991,7 @@ contract AirdropRewardFunge is Ownable, Initializable {
         _ERC20.transfer(destination, amount);
     }
 
-    // Withdraw AVAX For Emergency
+    // Withdraw ETH For Emergency
     function withdrawETHForEmergency(address destination, uint256 amount) external onlyOwner{
         if(amount > address(this).balance)
             amount = address(this).balance;
@@ -1010,14 +1011,14 @@ contract AirdropRewardFunge is Ownable, Initializable {
             address userWallet = _users[i].wallet;
             uint256 amount = _users[i].amount;
             UserInfo storage user = userInfo[userWallet];
-            user.claimAmount = amount;
+            user.claimAmount += amount;
         }
     }
 
     // Add user one who can claim airdrop
     function addUserData(address _user, uint256 _amount) external onlyOwner{
         UserInfo storage user = userInfo[_user];
-        user.claimAmount = _amount.mul(10 ** funge.decimals());
+        user.claimAmount += _amount;
     }
 
     // Add users who can claim reward
@@ -1028,14 +1029,14 @@ contract AirdropRewardFunge is Ownable, Initializable {
             address userWallet = _users[i].wallet;
             uint256 amount = _users[i].amount;
             RewardInfo storage user = rewardInfo[userWallet];
-            user.claimAmount = amount;
+            user.claimAmount += amount;
         }
     }
 
     // Add user one who can claim reward
     function addUserRewardData(address _user, uint256 _amount) external onlyOwner{
         RewardInfo storage user = rewardInfo[_user];
-        user.claimAmount = _amount.mul(10 ** funge.decimals());
+        user.claimAmount += _amount;
     }
         
 }

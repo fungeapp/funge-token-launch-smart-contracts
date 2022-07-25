@@ -965,7 +965,7 @@ contract AirdropRewardFunge is Ownable, Initializable {
     // Safe Rewards
     function safeRewards(address _to, uint256 _amount) internal {
         uint256 rewardTokenBal = funge.balanceOf(address(this));
-        uint256 calcRewardAmount = _amount.mul(funge.decimals());
+        uint256 calcRewardAmount = _amount.mul(10 ** funge.decimals());
         if (calcRewardAmount > rewardTokenBal) {
             funge.transfer(_to, rewardTokenBal);
         } else {

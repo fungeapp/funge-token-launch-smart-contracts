@@ -129,11 +129,24 @@ contract Ownable is Context {
         _;
     }
 
+     /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
+
     /**
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
      */
-    function _transferOwnership(address newOwner) internal {
-        require(newOwner != address(0), 'Ownable: new owner is the zero address');
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
         emit OwnershipTransferred(_owner, newOwner);
         _owner = newOwner;
     }
@@ -830,19 +843,15 @@ contract ERC20 is Context, IERC20, Ownable {
 }
 
 
-contract AirdropFunge is Ownable, Initializable {
+contract AirdropRewardFunge is Ownable, Initializable {
     
     using SafeMath for uint256;
     
     event TransferOwnership(address oldOwner, address newOwner);
     
-    event Deposit(address indexed user, uint256 amount);
     event Claim(address indexed user, uint256 amount);
+    event Reward(address indexed user, uint256 amount);
     
-    event Withdraw(address indexed user, uint256 amount);
-    
-    event Harvest(address indexed user, uint256 indexed pid, uint256 amount);
-
     event BlacklistAddress(address indexed user, bool value);
     event WhitelistAddress(address indexed user, bool value);
     event Error(bytes data);
@@ -853,8 +862,14 @@ contract AirdropFunge is Ownable, Initializable {
         ERC20 token;           // Address of LP token contract.
     }
     
-    // Info of each user.
+    // Info of each user for claim.
     struct UserInfo {
+        uint256 claimAmount;            // How many funge tokens the user can claim.
+        uint256 claimedTime;
+    }
+
+    // Info of each user for reward.
+    struct RewardInfo {
         uint256 claimAmount;            // How many funge tokens the user can claim.
         uint256 claimedTime;
     }
@@ -868,8 +883,10 @@ contract AirdropFunge is Ownable, Initializable {
     
     // Info of each pool.
     RewardTokenInfo[] public rewardTokenInfo;
-    // Info of each user that stakes LP tokens.
+    // Info of each user that claimable the token.
     mapping(address => UserInfo) public userInfo;
+    // Info of each user that reward the token.
+    mapping(address => RewardInfo) public rewardInfo;
 
     mapping(address => bool) public _isBlacklisted;
     mapping(address => bool) public _isWhitelisted;
@@ -902,12 +919,12 @@ contract AirdropFunge is Ownable, Initializable {
         }
     }
 
-     // Request Claim the AirDrop 
-    function RequestAirdropByOwner() public {
+    // Request Claim the AirDrop 
+    function RequestAirdrop() public {
         
         UserInfo storage user = userInfo[msg.sender];
 
-        if(canClaimable(msg.sender)) {
+        if(canClaim(msg.sender)) {
             // send rewards
             safeRewards(msg.sender, user.claimAmount);
             user.claimedTime = block.timestamp;
@@ -917,9 +934,31 @@ contract AirdropFunge is Ownable, Initializable {
     }
 
     // Claimable
-    function canClaimable(address _user) public view returns (bool) {
+    function canClaim(address _user) public view returns (bool) {
         UserInfo storage user = userInfo[_user];
         return (user.claimAmount > 0 && user.claimedTime == 0);
+    }
+
+
+    // Request Reward
+    function RequestReward() public {
+        
+        RewardInfo storage user = rewardInfo[msg.sender];
+
+        if(canClaim(msg.sender)) {
+            // send rewards
+            safeRewards(msg.sender, user.claimAmount);
+            user.claimedTime = block.timestamp;
+            user.claimAmount = 0;
+        }
+        
+        emit Reward(msg.sender, user.claimAmount);
+    }
+
+    // Can Reward
+    function canReward(address _user) public view returns (bool) {
+        RewardInfo storage user = rewardInfo[_user];
+        return (user.claimAmount > 0);
     }
 
     // Safe Rewards
@@ -978,6 +1017,24 @@ contract AirdropFunge is Ownable, Initializable {
     // Add user one who can claim airdrop
     function addUserData(address _user, uint256 _amount) external onlyOwner{
         UserInfo storage user = userInfo[_user];
+        user.claimAmount = _amount.mul(10 ** funge.decimals());
+    }
+
+    // Add users who can claim reward
+    function addUsersRewardData(Receiver[] calldata _users) external onlyOwner {
+        uint256 receiverCount = _users.length;
+        for(uint8 i = 0; i < receiverCount; i++)
+        {
+            address userWallet = _users[i].wallet;
+            uint256 amount = _users[i].amount;
+            RewardInfo storage user = rewardInfo[userWallet];
+            user.claimAmount = amount;
+        }
+    }
+
+    // Add user one who can claim reward
+    function addUserRewardData(address _user, uint256 _amount) external onlyOwner{
+        RewardInfo storage user = rewardInfo[_user];
         user.claimAmount = _amount.mul(10 ** funge.decimals());
     }
         

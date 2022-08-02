@@ -21,7 +21,7 @@ async function main() {
    });
 
    await v1contract.deployed();
-   console.log("V1 Contract deployed to:", v1contract.address);
+   console.log("FungeVesting V1 Contract deployed to:", v1contract.address);
 }
 
 main().catch((error) => {

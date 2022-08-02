@@ -71,12 +71,10 @@ module.exports = {
     ropsten: {
       url: `https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
       accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`],
-      gasPrice: 500000000000
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
       accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`],
-      gasPrice: 500000000000
     },
     kovan: {
       url: `https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
@@ -85,7 +83,6 @@ module.exports = {
     fuji: {
       url: `https://api.avax-test.network/ext/bc/C/rpc`,
       accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`],
-      gasPrice: 500000000000
     },
     avalanche: {
       url: `https://api.avax.network/ext/bc/C/rpc`,

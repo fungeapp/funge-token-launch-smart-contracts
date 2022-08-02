@@ -3,6 +3,8 @@ const BigNumber =  require("bignumber.js");
 
 async function main() {
 
+   const funge = "0x65CF1241F6d891346263a3F3EE5096a5527C90Af";
+
    const [deployer] = await ethers.getSigners();
 
    console.log("Deploying contracts with the account:", deployer.address);
@@ -12,11 +14,12 @@ async function main() {
    const gas = await ethers.provider.getGasPrice()
    console.log("Gas Price: ", new BigNumber(gas).toString());
 
-   const V1contract = await ethers.getContractFactory("V1");
-   console.log("Deploying V1contract...");
-   const v1contract = await upgrades.deployProxy(V1contract, [10], {
-      initializer: "initialValue",
+   const V1contract = await ethers.getContractFactory("FungeVesting");
+   console.log("Deploying FungeVesting V1 Contract...");
+   const v1contract = await upgrades.deployProxy(V1contract, [funge], {
+      initializer: "initialize",
    });
+
    await v1contract.deployed();
    console.log("V1 Contract deployed to:", v1contract.address);
 }

@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+
 
 /**
  * @title FungeVesting
  */
-contract FungeVesting is Ownable, ReentrancyGuard, Initializable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+    using SafeMathUpgradeable for uint256;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
     struct VestingSchedule{
         bool initialized;
         // beneficiary of tokens after they are released
@@ -38,7 +39,7 @@ contract FungeVesting is Ownable, ReentrancyGuard, Initializable {
     }
 
     // address of the ERC20 token
-    IERC20 private _token;
+    IERC20Upgradeable private _token;
 
     bytes32[] private vestingSchedulesIds;
     mapping(bytes32 => VestingSchedule) private vestingSchedules;
@@ -71,7 +72,10 @@ contract FungeVesting is Ownable, ReentrancyGuard, Initializable {
      */
     function initialize(address token_) public initializer {
         require(token_ != address(0x0));
-        _token = IERC20(token_);
+        _token = IERC20Upgradeable(token_);
+        __Context_init_unchained();
+        __Ownable_init_unchained();
+        __ReentrancyGuard_init_unchained();
     }
 
     receive() external payable {}

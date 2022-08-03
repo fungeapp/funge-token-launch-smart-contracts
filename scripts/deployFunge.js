@@ -1,6 +1,4 @@
 const { ethers, upgrades } = require("hardhat");
-const BigNumber =  require("bignumber.js");
-const { boolean } = require("hardhat/internal/core/params/argumentTypes");
 
 async function main() {
 

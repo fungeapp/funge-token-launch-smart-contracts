@@ -198,7 +198,7 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         require(vestingSchedule.revocable == true, "FungeVesting: vesting is not revocable");
         uint256 vestedAmount = _computeReleasableAmount(vestingSchedule);
         if(vestedAmount > 0){
-            release(vestingScheduleId, vestedAmount);
+            // release(vestingScheduleId, vestedAmount);
         }
         uint256 unreleased = vestingSchedule.amountTotal.sub(vestingSchedule.released);
         vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.sub(unreleased);
@@ -221,11 +221,9 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
     /**
     * @notice Release vested amount of tokens.
     * @param vestingScheduleId the vesting schedule identifier
-    * @param amount the amount to release
     */
     function release(
-        bytes32 vestingScheduleId,
-        uint256 amount
+        bytes32 vestingScheduleId
     )
         public
         nonReentrant
@@ -233,16 +231,37 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         VestingSchedule storage vestingSchedule = vestingSchedules[vestingScheduleId];
         bool isBeneficiary = msg.sender == vestingSchedule.beneficiary;
         bool isOwner = msg.sender == owner();
+        bool isContract = msg.sender == address(this);
         require(
-            isBeneficiary || isOwner,
+            isBeneficiary || isOwner || isContract,
             "FungeVesting: only beneficiary and owner can release vested tokens"
         );
         uint256 vestedAmount = _computeReleasableAmount(vestingSchedule);
-        require(vestedAmount >= amount, "FungeVesting: cannot release tokens, not enough vested tokens");
-        vestingSchedule.released = vestingSchedule.released.add(amount);
+        // require(vestedAmount >= amount, "FungeVesting: cannot release tokens, not enough vested tokens");
+        vestingSchedule.released = vestingSchedule.released.add(vestedAmount);
         address payable beneficiaryPayable = payable(vestingSchedule.beneficiary);
-        vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.sub(amount);
-        _token.safeTransfer(beneficiaryPayable, amount);
+        vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.sub(vestedAmount);
+        _token.safeTransfer(beneficiaryPayable, vestedAmount);
+    }
+
+    /**
+    * Release all vesting schedules for only owner
+    */
+    function releaseAll()
+        external {
+        uint256 loop = 0;
+        uint256 totalCountSchedule = this.getVestingSchedulesCount();
+        for(uint8 index = 0; index < totalCountSchedule; index++)
+        {
+            if(this.computeReleasableAmount(vestingSchedulesIds[index]) > 0) {
+                this.release(vestingSchedulesIds[index]);
+                loop++;
+            }
+
+            if(loop > 200) { // total transactions
+                break;
+            }
+        }
     }
 
     /**
@@ -343,6 +362,24 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
             vestedAmount = vestedAmount.sub(vestingSchedule.released);
             return vestedAmount;
         }
+    }
+
+    
+
+    /**
+    * @dev Check available to release the vesting schedule
+    * @return Returns the counts of the available vesting schedule
+    */
+    function isAvailableForRelease() public view returns(uint256) {
+        uint256 countAvailableSchdule = 0;
+        uint256 totalCountSchedule = this.getVestingSchedulesCount();
+        for(uint8 index = 0; index < totalCountSchedule; index++)
+        {
+            if(this.computeReleasableAmount(vestingSchedulesIds[index]) > 0) {
+                countAvailableSchdule++;
+            }
+        }
+        return countAvailableSchdule;
     }
 
     function getCurrentTime()

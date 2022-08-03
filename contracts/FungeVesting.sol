@@ -229,12 +229,12 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         nonReentrant
         onlyIfVestingScheduleNotRevoked(vestingScheduleId){
         VestingSchedule storage vestingSchedule = vestingSchedules[vestingScheduleId];
-        bool isBeneficiary = msg.sender == vestingSchedule.beneficiary;
+        // bool isBeneficiary = msg.sender == vestingSchedule.beneficiary;
         bool isOwner = msg.sender == owner();
         bool isContract = msg.sender == address(this);
         require(
-            isBeneficiary || isOwner || isContract,
-            "FungeVesting: only beneficiary and owner can release vested tokens"
+            isOwner || isContract,
+            "FungeVesting: only own contract and owner can release vested tokens"
         );
         uint256 vestedAmount = _computeReleasableAmount(vestingSchedule);
         // require(vestedAmount >= amount, "FungeVesting: cannot release tokens, not enough vested tokens");
@@ -248,7 +248,7 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
     * Release all vesting schedules for only owner
     */
     function releaseAll()
-        external {
+        external onlyOwner {
         uint256 loop = 0;
         uint256 totalCountSchedule = this.getVestingSchedulesCount();
         for(uint8 index = 0; index < totalCountSchedule; index++)

@@ -1,9 +1,3 @@
-/**
- *Submitted for verification at BscScan.com on 2020-09-29
-*/
-
-// File: contracts/IERC20.sol
-
 pragma solidity ^0.8.0;
 
 interface IERC20 {
@@ -347,11 +341,6 @@ abstract contract Initializable {
 // File: contracts/ERC20TokenImplementation.sol
 
 pragma solidity ^0.8.0;
-
-
-
-
-
 contract FungeToken is Context, IERC20, Initializable {
     using SafeMath for uint256;
 

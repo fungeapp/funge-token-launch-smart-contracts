@@ -1,6 +1,7 @@
 require('dotenv').config();
 require("@nomiclabs/hardhat-etherscan");
 require("@openzeppelin/hardhat-upgrades");
+require('@nomicfoundation/hardhat-toolbox')
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -54,8 +55,11 @@ module.exports = {
       },
     ],
   },
-  defaultNetwork: "matic",
+  defaultNetwork: "localhost",
   networks: {
+    localhost: {
+      url: `http://127.0.0.1:8545`,
+    },
     matic: {
       url: process.env.ALCHEMY_URL,
       accounts: [process.env.PRIVATE_KEY]
@@ -74,11 +78,11 @@ module.exports = {
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
-      accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`],
+      accounts: [`9ae393df5352ac05fc83cdca57a9302f3276537862c27856d0136a56dfa7cb7d`],
     },
     kovan: {
       url: `https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
-      accounts: [`de2087712bcf36bd5a39ac98b3c622c57f8625b42f4919888a97aac501b2120a`]
+      accounts: [`9ae393df5352ac05fc83cdca57a9302f3276537862c27856d0136a56dfa7cb7d`]
     },
     fuji: {
       url: `https://api.avax-test.network/ext/bc/C/rpc`,

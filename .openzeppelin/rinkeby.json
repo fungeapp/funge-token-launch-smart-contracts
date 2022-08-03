@@ -19,12 +19,244 @@
       "address": "0xa34B60158be7cD988c016F7a435c8BEc0bc3040b",
       "txHash": "0xbb4e60d41e8b299fe985ffef70874ff255fa4f6767aa4e07c6db7fc31994f7dd",
       "kind": "transparent"
+    },
+    {
+      "address": "0xDf89B79484127321aBfC1EE005BBc76430906e02",
+      "txHash": "0xf0156eee91927c888a095341d93f5576bff7cfaebfe13797c01174e80ab5891f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3cc3Af967D2323Badf38E03a1A88631EA4429946",
+      "txHash": "0x3946f27a0d59c68351efced310582adc3638f328ea5d588d7acf884b59223ce0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x45Bfc8Cefc9c3b920d6b35ED368Da742725Be5F7",
+      "txHash": "0x93680c87ae692370dda5fbbc064ccaff6415ccc1fc3f6c353cc94734e107d8b8",
+      "kind": "transparent"
     }
   ],
   "impls": {
     "27da6bd8d7ed073b63ccb9061c46c3f22f99c48c982f417703ffc770a3151bcc": {
       "address": "0xd688B20B67a2af4bd964C1bb75E5898929d36eE8",
       "txHash": "0x3af02cedf3c0c9b8286f52cf5e0758a88017e5c711543aea726356486c83a4e9",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "_token",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IERC20Upgradeable)419",
+            "contract": "FungeVesting",
+            "src": "contracts\\FungeVesting.sol:42"
+          },
+          {
+            "label": "vestingSchedulesIds",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_array(t_bytes32)dyn_storage",
+            "contract": "FungeVesting",
+            "src": "contracts\\FungeVesting.sol:44"
+          },
+          {
+            "label": "vestingSchedules",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_mapping(t_bytes32,t_struct(VestingSchedule)1881_storage)",
+            "contract": "FungeVesting",
+            "src": "contracts\\FungeVesting.sol:45"
+          },
+          {
+            "label": "vestingSchedulesTotalAmount",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_uint256",
+            "contract": "FungeVesting",
+            "src": "contracts\\FungeVesting.sol:46"
+          },
+          {
+            "label": "holdersVestingCount",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "FungeVesting",
+            "src": "contracts\\FungeVesting.sol:47"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IERC20Upgradeable)419": {
+            "label": "contract IERC20Upgradeable",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(VestingSchedule)1881_storage)": {
+            "label": "mapping(bytes32 => struct FungeVesting.VestingSchedule)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(VestingSchedule)1881_storage": {
+            "label": "struct FungeVesting.VestingSchedule",
+            "members": [
+              {
+                "label": "initialized",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "beneficiary",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "0"
+              },
+              {
+                "label": "cliff",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "start",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "duration",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "slicePeriodSeconds",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "revocable",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "amountTotal",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "released",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "revoked",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "8"
+              }
+            ],
+            "numberOfBytes": "288"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "abc95ed5dfdc157c3ac95822265b4ed165f1beb60621e087e29f353063553dba": {
+      "address": "0x3C5A994a28ecd1087f779981de2426c8F1a60E0f",
+      "txHash": "0xd66cfa0abee95f87311df02af397fb3b84ffcc1d3599186d14365f15eb5dbc29",
       "layout": {
         "storage": [
           {

@@ -1,0 +1,132 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [],
+  "impls": {
+    "d8122650cccccaf5872f4427cc25dd8039a2cc3d501e18ed149705076bece289": {
+      "address": "0xA7c59f010700930003b33aB25a7a0679C860f29c",
+      "txHash": "0xdaac030a64b1d12b1d96a4f88afb7b15eefa10769633076f002d371926a7ab0b",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\Funge.sol:300"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\Funge.sol:305"
+          },
+          {
+            "label": "_balances",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:347"
+          },
+          {
+            "label": "_allowances",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:348"
+          },
+          {
+            "label": "_totalSupply",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:349"
+          },
+          {
+            "label": "_name",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_string_storage",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:350"
+          },
+          {
+            "label": "_symbol",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_string_storage",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:351"
+          },
+          {
+            "label": "_decimals",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint8",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:352"
+          },
+          {
+            "label": "_initialSupply",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_uint256",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:353"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_address",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:355"
+          },
+          {
+            "label": "_mintable",
+            "offset": 20,
+            "slot": "8",
+            "type": "t_bool",
+            "contract": "FungeToken",
+            "src": "contracts\\Funge.sol:358"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

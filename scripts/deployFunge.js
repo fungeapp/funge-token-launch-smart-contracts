@@ -18,7 +18,7 @@ async function main() {
    console.log("Account balance:", (await deployer.getBalance()).toString());
 
    const gas = await ethers.provider.getGasPrice()
-   console.log("Gas Price: ", gas);
+   console.log("Gas Price:", ethers.utils.formatEther(gas));
 
    const V1contract = await ethers.getContractFactory("FungeToken");
    console.log("Deploying Funge Token Contract...");
@@ -29,7 +29,9 @@ async function main() {
    });
 
    await v1contract.deployed();
-   console.log("Funge Token Contract deployed to:", v1contract.address);
+
+   // const v1contract = await V1contract.deploy();
+   // console.log("Funge Token Contract deployed to:", v1contract.address);
 }
 
 main().catch((error) => {

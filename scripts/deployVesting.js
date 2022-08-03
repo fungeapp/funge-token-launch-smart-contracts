@@ -11,8 +11,8 @@ async function main() {
   
    console.log("Account balance:", (await deployer.getBalance()).toString());
 
-   const gas = await ethers.provider.getGasPrice()
-   console.log("Gas Price: ", new BigNumber(gas).toString());
+   const gas = await ethers.provider.getGasPrice();
+   console.log("Gas Price: ", gas.toNumber());
 
    const V1contract = await ethers.getContractFactory("FungeVesting");
    console.log("Deploying FungeVesting V1 Contract...");

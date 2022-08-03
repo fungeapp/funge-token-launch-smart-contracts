@@ -203,6 +203,7 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         uint256 unreleased = vestingSchedule.amountTotal.sub(vestingSchedule.released);
         vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.sub(unreleased);
         vestingSchedule.revoked = true;
+        emit Revoked();
     }
 
     /**
@@ -345,7 +346,7 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
     }
 
     function getCurrentTime()
-        internal
+        public
         virtual
         view
         returns(uint256){

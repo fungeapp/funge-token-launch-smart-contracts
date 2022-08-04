@@ -1,13 +1,8 @@
-# Sample Hardhat Project
+# Funge Smart Contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+- Funge ERC20 token contract
+- Funge Seed Sale vesting contract
+- Funge Private Sale vesting contract
+- Funge Airdrop Contract
+- Funge Reward Contract
+- Funge ERC721 NFT

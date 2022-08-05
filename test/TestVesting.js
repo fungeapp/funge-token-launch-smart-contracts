@@ -78,7 +78,7 @@ describe("Testing of the Funge Vesting Contract", function () {
 
             const { FungeVesting, owner, otherAccount, FungeAddress } = await loadFixture(deployFungeVestingFixture);
 
-            const vestingSchduleId = await FungeVesting.
+            // const vestingSchduleId = await FungeVesting.
             
 
             await expect(FungeVesting.connect(otherAccount)

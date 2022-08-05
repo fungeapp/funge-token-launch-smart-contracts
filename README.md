@@ -6,3 +6,42 @@
 - Funge Airdrop Contract
 - Funge Reward Contract
 - Funge ERC721 NFT
+
+
+### Development
+
+#### Setup
+
+Install dependencies with [Yarn](https://yarnpkg.com/en/):
+
+```bash
+yarn install
+```
+
+
+#### Testing
+
+Run local node to provide a simulated EVM:
+
+```bash
+npx start node
+```
+
+In a separate terminal, run the testsuite:
+
+```bash
+npx hardhat test
+```
+#### Deployment
+
+Edit [hardhat.config.js](hardhat.config.js) and then run:
+
+```bash
+npx hardhat run --network [network] scripts/[script]
+```
+
+#### Verify Smart Contract
+
+```bash
+npx hardhat verify --network [network] [address] [unlock time]
+```

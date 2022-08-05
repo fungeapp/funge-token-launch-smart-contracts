@@ -37,7 +37,7 @@ npx hardhat test
 Edit [hardhat.config.js](hardhat.config.js) and then run:
 
 ```bash
-npx hardhat run --network [network] scripts/[script]
+npx hardhat run --network [network] [script]
 ```
 
 #### Verify Smart Contract

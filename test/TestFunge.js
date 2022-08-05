@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const { assert, expect } = require("chai");
 const { ethers } = require("hardhat");
 const BigNumber =  require("bignumber.js");
 const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
@@ -6,9 +6,10 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 
 
 describe("Testing of the Funge ERC20 Contract", function () {
+    const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
     async function deployFungeFixture() {
-        const [owner, otherAccount, addr1, addr2] = await ethers.getSigners();
+        const [owner, otherAccount, addr1, addr2, spender] = await ethers.getSigners();
 
         const _mintable = true;
         const _name = "Funge";
@@ -28,7 +29,7 @@ describe("Testing of the Funge ERC20 Contract", function () {
         await Funge.initialize(_name, _symbol, _decimals, _initialSupply, _mintable, owner.address);
         // console.log("Funge contract address:", Funge.address);
 
-        return { Funge, owner, otherAccount, _mintable, addr1, addr2 };
+        return { Funge, owner, otherAccount, _mintable, addr1, addr2, spender };
     }
 
     describe("Deployment", function () {
@@ -122,4 +123,468 @@ describe("Testing of the Funge ERC20 Contract", function () {
 		});
     });
 
-});
+    describe("Mint", function () {
+        it("Only owner can mint the Funge token", async function () {
+            const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+            await expect(Funge.connect(otherAccount)
+            .mint(50)).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+        it("Mint the token and check balance of owner", async function () {
+            const { Funge, owner } = await loadFixture(deployFungeFixture);
+            const initialOwnerBalance = await Funge.balanceOf(owner.address);
+            // Mint
+            await Funge.mint(50);
+            // Owner balance should have changed.
+            expect(await Funge.balanceOf(owner.address)).to.equal(
+                initialOwnerBalance.add(50)
+            );
+        });
+    });
+
+    describe("Burn", function () {
+        it("Burn the token and check balance of owner", async function () {
+            const { Funge, owner } = await loadFixture(deployFungeFixture);
+            const initialOwnerBalance = await Funge.balanceOf(owner.address);
+            // Mint
+            await Funge.burn(50);
+            // Owner balance should have changed.
+            expect(await Funge.balanceOf(owner.address)).to.equal(
+                initialOwnerBalance.sub(50)
+            );
+        });
+    });
+
+    
+
+    describe("Approve", function () {
+
+        describe('when the spender is not the zero address', function () {
+            const amount = 100;
+			describe('when the sender has enough balance', function () {
+                it('emits an approval event', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    const spender = otherAccount;
+                    
+                    await expect(Funge.approve(spender.address, amount))
+                    .to.emit(Funge, "Approval")
+                    .withArgs(owner.address, spender.address, amount);
+				});
+                describe('when there was no approved amount before', function () {
+                    it('approves the requested amount', async function () {
+
+                        const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                        const spender = otherAccount;
+
+                        await Funge.approve(spender.address, amount, { from: owner.address });
+
+                        const allowance = await Funge.allowance(owner.address, spender.address);
+
+                        expect(allowance).to.equal(
+                            amount
+                        );
+                    });
+                });
+                describe('when the spender had an approved amount', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    const spender = otherAccount;
+                    beforeEach(async function () {
+                        await Funge.approve(spender.address, 1, { from: owner.address });
+                    });
+
+                    it('approves the requested amount and replaces the previous one', async function () {
+                        await Funge.approve(spender.address, amount, { from: owner.address });
+
+                        const allowance = await Funge.allowance(owner.address, spender.address);
+                        expect(allowance).to.equal(
+                            amount
+                        );
+                    });
+                });
+            });
+
+            describe('when the sender does not have enough balance', async function () {
+                const amount = 101;
+    
+                it('emits an approval event', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    const spender = otherAccount;
+    
+                    const { logs } = await Funge.approve(spender.address, amount, { from: owner.address });
+    
+                    await expect(Funge.approve(spender.address, amount))
+                    .to.emit(Funge, "Approval")
+                    .withArgs(owner.address, spender.address, amount);
+    
+                });
+    
+                describe('when there was no approved amount before', function () {
+                    it('approves the requested amount', async function () {
+                        const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                        const spender = otherAccount;
+                        await Funge.approve(spender.address, amount, { from: owner.address });
+    
+                        const allowance = await Funge.allowance(owner.address, spender.address);
+                        expect(allowance).to.equal(
+                            amount
+                        );
+                    });
+                });
+    
+                describe('when the spender had an approved amount', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    const spender = otherAccount;
+                    beforeEach(async function () {
+                        await Funge.approve(spender.address, 1, { from: owner.address });
+                    });
+    
+                    it('approves the requested amount and replaces the previous one', async function () {
+                        await Funge.approve(spender.address, amount, { from: owner.address });
+    
+                        const allowance = await Funge.allowance(owner.address, spender.address);
+                        expect(allowance).to.equal(
+                            amount
+                        );
+                    });
+                });
+            });
+        });
+
+        describe('when the spender is the zero address', function () {
+			const amount = 100;
+			const spender = ZERO_ADDRESS;
+			it('approves the requested amount', async function () {
+                const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                await expect(Funge.approve(spender, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+			});
+		});
+
+    });
+
+    describe("Transfer From", function () {
+
+
+        const amount = 100;
+        describe('when the recipient is not the zero address', async function () {
+
+            describe('when the spender has enough approved balance', async function () {
+            
+                it("transfers the requested amount", async function () {
+                    const { Funge, owner, otherAccount, addr1 } = await loadFixture(deployFungeFixture);
+                    const initialOwnerBalance = await Funge.balanceOf(owner.address);
+                    await Funge.approve(owner.address, amount, { from: owner.address });
+                    await Funge.transferFrom(owner.address, otherAccount.address, amount,  { from: owner.address });
+
+                    // Owner balance should have changed.
+                    expect(await Funge.balanceOf(owner.address)).to.equal(
+                        initialOwnerBalance.sub(amount)
+                    );
+
+                    const recipientBalance = await Funge.balanceOf(otherAccount.address);
+                    expect(recipientBalance).to.equal(
+                        amount
+                    );
+                });
+
+                it('decreases the spender allowance', async function () {
+                    const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                    const initialOwnerBalance = await Funge.balanceOf(owner.address);
+                    await Funge.approve(owner.address, amount, { from: owner.address });
+                    await Funge.transferFrom(owner.address, otherAccount.address, amount, { from: owner.address });
+
+                    const allowance = await Funge.allowance(owner.address, owner.address);
+                    expect(allowance).to.equal(
+                        0
+                    );
+                });
+
+                it('emits a transfer event', async function () {
+                    const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                    const initialOwnerBalance = await Funge.balanceOf(owner.address);
+
+                    await Funge.approve(owner.address, amount, { from: owner.address });
+
+                    await expect(Funge.transferFrom(owner.address, otherAccount.address, amount, { from: owner.address }))
+                    .to.emit(Funge, "Transfer")
+                    .withArgs(owner.address, otherAccount.address, amount);
+                });
+
+            });
+            describe('when the owner does not have enough balance', function () {
+                const amount = 99;
+                it('reverts', async function () {
+                    const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                    await Funge.approve(owner.address, amount, { from: owner.address });
+                    const initialOwnerBalance = await Funge.balanceOf(owner.address);
+                    await expect(Funge.transferFrom(owner.address, otherAccount.address, 100, { from: owner.address })).to.be.reverted;
+                });
+            });
+        });
+        describe('when the spender does not have enough approved balance', function () {
+
+                describe('when the owner has enough balance', function () {
+                    const amount = 100;
+
+                    it('reverts', async function () {
+                        const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                        await Funge.approve(owner.address, 99, { from: owner.address });
+                        await expect(Funge.transferFrom(owner.address, otherAccount.address, amount, { from: owner.address })).to.be.reverted;
+                    });
+                });
+
+                describe('when the owner does not have enough balance', function () {
+                    const amount = 101;
+
+                    it('reverts', async function () {
+                        const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                        await Funge.approve(owner.address, 99, { from: owner.address });
+                        await expect(Funge.transferFrom(owner.address, spender.address, amount, { from: owner.address })).to.be.reverted;
+                    });
+                });
+            });
+            describe('when the recipient is the zero address', function () {
+                const amount = 100;
+                const to = ZERO_ADDRESS;
+    
+                it('reverts', async function () {
+                    const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                    await Funge.approve(owner.address, amount, { from: owner.address });
+                    await expect(Funge.approve(to, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+
+                    // await expect(Funge.transferFrom(owner.address, to.address, amount, { from: owner.address })).to.be.reverted;
+                });
+            });
+        });
+
+        describe('Decrease approval', function () {
+            describe('when the spender is not the zero address', function () {
+    
+                describe('when the sender has enough balance', function () {
+                    const amount = 100;
+    
+                    it('emits an approval event', async function () {
+                        const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+
+                        await Funge.approve(spender.address, amount, { from: owner.address });
+
+                        const { logs } = await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+                        await expect(Funge.approve(spender.address, amount))
+                        .to.emit(Funge, "Approval")
+                        .withArgs(owner.address, spender.address, amount);
+    
+                    });
+    
+                    describe('when there was no approved amount before', function () {
+                        it('keeps the allowance to zero', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.approve(spender.address, amount, { from: owner.address });
+                            await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            assert.equal(allowance, 0);
+                        });
+                    });
+    
+                    describe('when the spender had an approved amount', function () {
+                        
+                        it('decreases the spender allowance subtracting the requested amount', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.approve(spender.address, amount + 1, { from: owner.address });
+                            
+                            await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            assert.equal(allowance, 1);
+                        });
+                    });
+                });
+    
+                describe('when the sender does not have enough balance', function () {
+                    const amount = 101;
+    
+                    it('emits an approval event', async function () {
+                        const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                        await Funge.approve(spender.address, amount, { from: owner.address });
+                        const { logs } = await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                        await expect(Funge.approve(spender.address, amount))
+                        .to.emit(Funge, "Approval")
+                        .withArgs(owner.address, spender.address, amount);
+                    });
+    
+                    describe('when there was no approved amount before', function () {
+                        it('keeps the allowance to zero', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.approve(spender.address, amount, { from: owner.address });
+                            await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            expect(allowance).to.equal(
+                                0
+                            );
+                        });
+                    });
+    
+                    describe('when the spender had an approved amount', function () {
+    
+                        it('decreases the spender allowance subtracting the requested amount', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.approve(spender.address, amount + 1, { from: owner.address });
+                            await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            expect(allowance).to.equal(
+                                1
+                            );
+                        });
+                    });
+                });
+            });
+    
+            describe('when the spender is the zero address', function () {
+                const amount = 100;
+                const spender = ZERO_ADDRESS;
+    
+                it('decreases the requested amount', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    await expect(Funge.approve(spender, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+                    // await Funge.approve(spender.address, amount, { from: owner.address });
+
+                    // await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                    // const allowance = await Funge.allowance(owner.address, spender);
+                    // expect(allowance).to.equal(
+                    //     0
+                    // );
+                });
+    
+                it('emits an approval event', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+
+                    await expect(Funge.approve(spender, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+                    // await Funge.approve(spender.address, amount, { from: owner.address });
+                    // const { logs } = await Funge.decreaseAllowance(spender.address, amount, { from: owner.address });
+    
+                    // await expect(Funge.approve(spender.address, amount))
+                    // .to.emit(Funge, "Approval")
+                    // .withArgs(owner.address, spender.address, amount);
+                });
+            });
+        });
+
+        describe('Increase approval', function () {
+            const amount = 100;
+    
+            describe('when the spender is not the zero address', function () {
+    
+                describe('when the sender has enough balance', function () {
+                    it('emits an approval event', async function () {
+
+                        const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+
+                        const { logs } = await Funge.increaseAllowance(spender.address, amount, { from: owner.address });
+    
+                        await expect(Funge.approve(spender.address, amount))
+                        .to.emit(Funge, "Approval")
+                        .withArgs(owner.address, spender.address, amount);
+                    });
+    
+                    describe('when there was no approved amount before', function () {
+                        it('approves the requested amount', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.increaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            expect(allowance).to.equal(
+                                amount
+                            );
+                        });
+                    });
+    
+                    describe('when the spender had an approved amount', function () {
+                       
+    
+                        it('increases the spender allowance adding the requested amount', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.approve(spender.address, 1, { from: owner.address });
+                            await Funge.increaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            expect(allowance).to.equal(
+                                amount + 1
+                            );
+                            
+                        });
+                    });
+                });
+    
+                describe('when the sender does not have enough balance', function () {
+                    const amount = 101;
+    
+                    it('emits an approval event', async function () {
+                        const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                        const { logs } = await Funge.increaseAllowance(spender.address, amount, { from: owner.address });
+    
+                        await expect(Funge.approve(spender.address, amount))
+                        .to.emit(Funge, "Approval")
+                        .withArgs(owner.address, spender.address, amount);
+                    });
+    
+                    describe('when there was no approved amount before', function () {
+                        it('approves the requested amount', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.increaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            expect(allowance).to.equal(
+                                amount
+                            );
+                        });
+                    });
+    
+                    describe('when the spender had an approved amount', function () {
+                        it('increases the spender allowance adding the requested amount', async function () {
+                            const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                            await Funge.approve(spender.address, 1, { from: owner.address });
+                            await Funge.increaseAllowance(spender.address, amount, { from: owner.address });
+    
+                            const allowance = await Funge.allowance(owner.address, spender.address);
+                            expect(allowance).to.equal(
+                                amount + 1
+                            );
+                        });
+                    });
+                });
+            });
+    
+            describe('when the spender is the zero address', function () {
+                const spender = ZERO_ADDRESS;
+    
+                it('approves the requested amount', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    await expect(Funge.approve(spender, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+                });
+    
+                it('emits an approval event', async function () {
+                    const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                    await expect(Funge.approve(spender, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+                });
+            });
+        });
+
+        describe('TransferOwnership', function () {
+
+            it("Only owner can change old owner to new owner", async function () {
+                const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                await expect(Funge.connect(otherAccount)
+                .transferOwnership(otherAccount.address)).to.be.revertedWith("Ownable: caller is not the owner");
+            });
+
+            it('Change owner and check new owner', async function () {
+                const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
+                await Funge.transferOwnership(otherAccount.address);
+
+                expect(await Funge.getOwner()).to.be.equal(otherAccount.address);
+            });
+        });
+
+    });

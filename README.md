@@ -24,7 +24,7 @@ yarn install
 Run local node to provide a simulated EVM:
 
 ```bash
-npx start node
+npx hardhat node
 ```
 
 In a separate terminal, run the testsuite:

@@ -271,15 +271,15 @@ describe("Testing of the Funge ERC20 Contract", function () {
                 it("transfers the requested amount", async function () {
                     const { Funge, owner, otherAccount, addr1 } = await loadFixture(deployFungeFixture);
                     const initialOwnerBalance = await Funge.balanceOf(owner.address);
-                    await Funge.approve(owner.address, amount, { from: owner.address });
-                    await Funge.transferFrom(owner.address, otherAccount.address, amount,  { from: owner.address });
+                    await Funge.approve(otherAccount.address, amount, { from: owner.address });
+                    await Funge.connect(otherAccount).transferFrom(owner.address, addr1.address, amount,  { from: otherAccount.address });
 
                     // Owner balance should have changed.
                     expect(await Funge.balanceOf(owner.address)).to.equal(
                         initialOwnerBalance.sub(amount)
                     );
 
-                    const recipientBalance = await Funge.balanceOf(otherAccount.address);
+                    const recipientBalance = await Funge.balanceOf(addr1.address);
                     expect(recipientBalance).to.equal(
                         amount
                     );
@@ -287,11 +287,10 @@ describe("Testing of the Funge ERC20 Contract", function () {
 
                 it('decreases the spender allowance', async function () {
                     const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
-                    const initialOwnerBalance = await Funge.balanceOf(owner.address);
-                    await Funge.approve(owner.address, amount, { from: owner.address });
-                    await Funge.transferFrom(owner.address, otherAccount.address, amount, { from: owner.address });
+                    await Funge.approve(otherAccount.address, amount, { from: owner.address });
+                    await Funge.connect(otherAccount).transferFrom(owner.address, spender.address, amount, { from: otherAccount.address });
 
-                    const allowance = await Funge.allowance(owner.address, owner.address);
+                    const allowance = await Funge.allowance(owner.address, otherAccount.address);
                     expect(allowance).to.equal(
                         0
                     );
@@ -301,11 +300,11 @@ describe("Testing of the Funge ERC20 Contract", function () {
                     const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
                     const initialOwnerBalance = await Funge.balanceOf(owner.address);
 
-                    await Funge.approve(owner.address, amount, { from: owner.address });
+                    await Funge.approve(otherAccount.address, amount, { from: owner.address });
 
-                    await expect(Funge.transferFrom(owner.address, otherAccount.address, amount, { from: owner.address }))
+                    await expect(Funge.connect(otherAccount).transferFrom(owner.address, spender.address, amount, { from: otherAccount.address }))
                     .to.emit(Funge, "Transfer")
-                    .withArgs(owner.address, otherAccount.address, amount);
+                    .withArgs(owner.address, spender.address, amount);
                 });
 
             });
@@ -313,9 +312,9 @@ describe("Testing of the Funge ERC20 Contract", function () {
                 const amount = 99;
                 it('reverts', async function () {
                     const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
-                    await Funge.approve(owner.address, amount, { from: owner.address });
+                    await Funge.approve(otherAccount.address, amount, { from: owner.address });
                     const initialOwnerBalance = await Funge.balanceOf(owner.address);
-                    await expect(Funge.transferFrom(owner.address, otherAccount.address, 100, { from: owner.address })).to.be.reverted;
+                    await expect(Funge.connect(otherAccount).transferFrom(owner.address, spender.address, 100, { from: otherAccount.address })).to.be.reverted;
                 });
             });
         });
@@ -325,9 +324,9 @@ describe("Testing of the Funge ERC20 Contract", function () {
                     const amount = 100;
 
                     it('reverts', async function () {
-                        const { Funge, owner, otherAccount } = await loadFixture(deployFungeFixture);
-                        await Funge.approve(owner.address, 99, { from: owner.address });
-                        await expect(Funge.transferFrom(owner.address, otherAccount.address, amount, { from: owner.address })).to.be.reverted;
+                        const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
+                        await Funge.approve(otherAccount.address, 99, { from: owner.address });
+                        await expect(Funge.connect(otherAccount).transferFrom(owner.address, spender.address, amount, { from: otherAccount.address })).to.be.reverted;
                     });
                 });
 
@@ -336,8 +335,8 @@ describe("Testing of the Funge ERC20 Contract", function () {
 
                     it('reverts', async function () {
                         const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
-                        await Funge.approve(owner.address, 99, { from: owner.address });
-                        await expect(Funge.transferFrom(owner.address, spender.address, amount, { from: owner.address })).to.be.reverted;
+                        await Funge.approve(otherAccount.address, 99, { from: owner.address });
+                        await expect(Funge.connect(otherAccount).transferFrom(owner.address, spender.address, amount, { from: otherAccount.address })).to.be.reverted;
                     });
                 });
             });
@@ -347,10 +346,10 @@ describe("Testing of the Funge ERC20 Contract", function () {
     
                 it('reverts', async function () {
                     const { Funge, owner, otherAccount, spender } = await loadFixture(deployFungeFixture);
-                    await Funge.approve(owner.address, amount, { from: owner.address });
-                    await expect(Funge.approve(to, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
+                    await Funge.approve(otherAccount.address, amount, { from: owner.address });
+                    // await expect(Funge.approve(to, amount, { from: owner.address })).to.be.revertedWith("ERC20: approve to the zero address");
 
-                    // await expect(Funge.transferFrom(owner.address, to.address, amount, { from: owner.address })).to.be.reverted;
+                    await expect(Funge.connect(otherAccount).transferFrom(owner.address, to, amount, { from: otherAccount.address })).to.be.reverted;
                 });
             });
         });

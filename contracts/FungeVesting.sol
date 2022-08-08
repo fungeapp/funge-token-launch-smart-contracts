@@ -157,8 +157,14 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         bool _revocable,
         uint256 _amount
     )
-        public
-        onlyOwner{
+    public
+    {
+        bool isOwner = msg.sender == owner();
+        bool isContract = msg.sender == address(this);
+        require(
+            isOwner || isContract,
+            "FungeVesting: only own contract and owner can create vesting schedule"
+        );
         require(
             this.getWithdrawableAmount() >= _amount,
             "FungeVesting: cannot create vesting schedule because not sufficient tokens"
@@ -184,6 +190,23 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         vestingSchedulesIds.push(vestingScheduleId);
         uint256 currentVestingCount = holdersVestingCount[_beneficiary];
         holdersVestingCount[_beneficiary] = currentVestingCount.add(1);
+    }
+
+    // Create Vesting Schdules by owner
+    function createVestingSchdules(VestingSchedule[] calldata vestingSchdules) public onlyOwner {
+        uint256 receiverCount = vestingSchdules.length;
+        for(uint8 i = 0; i < receiverCount; i++)
+        {
+            address _beneficiary = vestingSchdules[i].beneficiary;
+            uint256 _start = vestingSchdules[i].start;
+            uint256 _cliff = vestingSchdules[i].cliff;
+            uint256 _duration = vestingSchdules[i].duration;
+            uint256 _slicePeriodSeconds = vestingSchdules[i].slicePeriodSeconds;
+            bool _revocable = vestingSchdules[i].revocable;
+            uint256 _amount = vestingSchdules[i].amountTotal;
+
+            this.createVestingSchedule(_beneficiary, _start, _cliff, _duration, _slicePeriodSeconds, _revocable, _amount);
+        }
     }
 
     /**

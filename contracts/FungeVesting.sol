@@ -192,18 +192,35 @@ contract FungeVesting is Initializable, OwnableUpgradeable, ReentrancyGuardUpgra
         holdersVestingCount[_beneficiary] = currentVestingCount.add(1);
     }
 
+    struct ExcelVestingSchedule {
+        // beneficiary of tokens after they are released
+        address  beneficiary;
+        // cliff period in seconds
+        uint256  cliff;
+        // start time of the vesting period
+        uint256  start;
+        // duration of the vesting period in seconds
+        uint256  duration;
+        // duration of a slice period for the vesting in seconds
+        uint256 slicePeriodSeconds;
+        // whether or not the vesting is revocable
+        bool  revocable;
+        // total amount of tokens to be released at the end of the vesting
+        uint256 amountTotal;
+    }
+
     // Create Vesting Schdules by owner
-    function createVestingSchdules(VestingSchedule[] calldata vestingSchdules) public onlyOwner {
-        uint256 receiverCount = vestingSchdules.length;
+    function createVestingSchedulesByExcel(ExcelVestingSchedule[] calldata excelVestingSchedules) public onlyOwner {
+        uint256 receiverCount = excelVestingSchedules.length;
         for(uint8 i = 0; i < receiverCount; i++)
         {
-            address _beneficiary = vestingSchdules[i].beneficiary;
-            uint256 _start = vestingSchdules[i].start;
-            uint256 _cliff = vestingSchdules[i].cliff;
-            uint256 _duration = vestingSchdules[i].duration;
-            uint256 _slicePeriodSeconds = vestingSchdules[i].slicePeriodSeconds;
-            bool _revocable = vestingSchdules[i].revocable;
-            uint256 _amount = vestingSchdules[i].amountTotal;
+            address _beneficiary = excelVestingSchedules[i].beneficiary;
+            uint256 _start = excelVestingSchedules[i].start;
+            uint256 _cliff = excelVestingSchedules[i].cliff;
+            uint256 _duration = excelVestingSchedules[i].duration;
+            uint256 _slicePeriodSeconds = excelVestingSchedules[i].slicePeriodSeconds;
+            bool _revocable = excelVestingSchedules[i].revocable;
+            uint256 _amount = excelVestingSchedules[i].amountTotal;
 
             this.createVestingSchedule(_beneficiary, _start, _cliff, _duration, _slicePeriodSeconds, _revocable, _amount);
         }
